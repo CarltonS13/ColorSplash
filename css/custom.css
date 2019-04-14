@@ -1,0 +1,261 @@
+.nav-bar {
+  /* color : #ffffff; */
+  /* box-shadow: 0 4px 2px -2px gray; */
+  border-radius: 2px;
+  box-shadow: 0px 1px 7px #999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  /* height: 3.5rem; */
+  background: #fff;
+  z-index: 99;
+}
+
+.nav-bar-item {
+  text-align: center;
+  margin: 1rem;
+  margin-bottom: 0;
+  /* line-height: 2em; */
+}
+
+
+.logo {
+  /* margin-left: 1rem; */
+  font-size: 1.5em;
+  background: -webkit-linear-gradient(#56CCF2, #2F80ED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.search {
+  background-color: #E5E5E5;
+  border-radius: 7px;
+  border: none;
+  height: 2em;
+  margin-bottom: 0;
+}
+
+.search-btn {
+  height: 100%;
+  padding: 0px;
+  line-height: 2.5em;
+}
+
+.nav-bar a {
+  font-family: Helvetica;
+  font-style: normal;
+  font-weight: normal;
+  line-height: normal;
+  text-decoration: none;
+  color: #2F80ED;
+  padding: 1em;
+}
+
+a:hover {
+  color: #56CCF2;
+}
+
+.gallery-item {
+  padding: 1.5rem;
+  /* width: 100%; */
+}
+
+/*____________Modal___________________________________  */
+.modal-image {
+  width: 100%;
+  display:block;
+  margin:auto;
+}
+@media (min-width: 550px) {
+  .modal-image {
+    height: 40rem;
+    width:auto;
+}
+}
+
+/* The Modal (background) */
+.modal {
+  display: block;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+  /* border-radius: 7px; */
+}
+/* Larger than phablet (also point when grid becomes active) */
+@media (min-width: 550px) {
+  .modal {
+  overflow: auto;
+  /* Enable scroll if needed */
+}
+}
+
+.modal-name{
+  text-align: center;
+  margin: 1em 0 0 0;
+  margin:
+}
+
+
+
+/* Modal Content/Box */
+.modal-content {
+  border-radius: 7px;
+  background-color: #fefefe;
+  margin: 3% auto;
+  /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  min-height: 40em;
+  /* Could be more or less, depending on screen size */
+}
+
+.modal-color{
+  padding: 1em 0 ;
+}
+
+.color-block {
+  height: 10rem;
+}
+
+
+.download-btn{
+  margin: 1em;
+}
+
+html, body {
+        height: 100%;
+        margin: 0;
+    }
+
+.app{
+  height: 100%;
+  margin: 0;
+}
+
+
+
+/********************Intro  */
+.intro{
+  background: url('../images/intro.jpg');
+  background-size: cover;
+  min-height: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.intro-logo{
+  font-size: 5em;
+  /* text-align: center; */
+  background: -webkit-linear-gradient(#56CCF2, #2F80ED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+    margin-bottom: 0px;
+}
+
+
+.intro-search{
+
+}
+
+.button-primary{
+  border-radius: 30px;
+}
+
+.intro-search-bar{
+  background-color: #FFFFFF;
+  border-radius: 14px;
+  border: none;
+  height: 2em;
+  margin-bottom: 0;
+  min-width: 50%;
+}
+
+
+/****************Gallery***************/
+.gallery-title {
+  text-align: center;
+  /* margin-bottom: 2em; */
+  margin-top: 2em;
+}
+
+ .gallery-title:after{
+    position: relative;
+    content: "";
+    width: 30%;
+    left: 35%;
+    display: block;
+    margin-bottom: 1em;
+    border-bottom: 7px solid #2F80ED;
+}
+
+.more-btn{
+  margin: 3em 0;
+}
+
+.to-top-btn{
+  /* width: 10px; */
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  display: block;
+  /* height: 3.5rem; */
+  background: #fff;
+  z-index: 99;
+  margin: 3em;
+  padding: 0 7px;
+}
+
+.up-svg{
+  fill: white;
+  /* height: auto; */
+}
+
+/************* hidden file upload ***********/
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.upload-btn-wrapper input[type=file] {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
+/************* footer ***********/
+.footer{
+  margin-bottom: 0px;
+  color: white;
+  background-color: #2F80ED;
+  text-align: right;
+}
+.footer p {
+  margin-bottom: 0px;
+}
+
+.footer a {
+  color: white;
+}
+
+.pointer {cursor: pointer;}

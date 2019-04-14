@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>ColorSplash</title>
+  <meta name="color schemes from pictures" content="">
+  <meta name="Carlton Segbefia" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/custom.css">
+
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+</head>
+
+<body>
+
+
+
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div id="app" class="app">
+
+    <div class="intro" ref="intro">
+      <div class="intro-search">
+        <h1 class="intro-logo">ColorSplash</h1>
+        <h5 v-observe-visibility="introSearchVisibilityChanged" class="intro-title">Get Color Schemes from Images</h5>
+        <input v-model="query" class="intro-search-bar" placeholder="search or enter url" style="padding-left: 1em;">
+        <button v-on:click="search()" v-on:keyup.enter="search()" class="intro-search-btn button-primary">Search</button>
+        <!-- <button v-on:click="search()" class="intro-search-btn button-primary">Upload Image</button> -->
+        <div class="upload-btn-wrapper">
+          <button class="intro-search-btn button-primary">Upload Image</button>
+          <input @change="imageChange($event)" id="imageUpload" type="file" name="imageUpload" accept="image/*" />
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- <div v-if="showNav" class="nav-bar">
+        <div class="container">
+          <div class="row ">
+            <div class="two columns logo nav-bar-item">ColorSplash</div>
+            <div class="seven columns bar nav-bar-item">
+              <input v-model="query" class="ten columns search "
+              placeholder="search or enter url" style="padding-left: 1em;">
+              <button v-on:click="search()" class="two columns search-btn button-primary">Search</button>
+            </div>
+            <div class="three columns nav-bar-item">
+              <a class="">Random</a>
+              <a class="" v-on:click="showAbout()">About</a>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="row">
+        <div v-if="this.galleryState" id="gallery" ref="gallery" class="gallery">
+          <h2 class="gallery-title">{{this.searchedQuery}}</h2>
+          <masonry :cols="{default: 3, 1000: 3, 700: 2, 500: 1}" :gutter="0">
+            <div class="gallery-item" v-for="(item, index) in items" :key="index" v-on:click="showModal(item.urls.small, item.user.name)">
+              <img class="u-max-full-width" :src="item.urls.small" alt="an image from unsplash">
+            </div>
+          </masonry>
+        </div>
+      </div>
+
+      <div class="row">
+        <button v-if="showButton()" class="more-btn button-primary two columns offset-by-five" v-on:click="loadMore()">Load More</button>
+      </div>
+
+      <div class="row">
+        <button v-if="showNav" class="button-primary to-top-btn" v-on:click="gotoIntro()">TOP</button>
+      </div>
+    </div>
+
+    <footer  class="footer">
+      <div class="container">
+        <div class="twelve columns">
+          <div class="two columns">
+            <a class="pointer" style="text-decoration: underline;" v-on:click="showAbout()">About</a>
+          </div>
+          <div class="two columns">
+            <a href="mailto:me@carltonsegbefia.com">Contact Me</a>
+          </div>
+          <div class="seven columns">
+            <p>&copy; 2019. Carlton Segbefia. All Rights Reserved.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div class="modal" v-if="modalState">
+      <div class="container modal-content " v-click-outside="hideModal">
+        <div class="row">
+          <img class="modal-image" :src="modalImage" ref="modal-image"/>
+          <!-- <div class="modal-image" v-bind:style="{ backgroundImage: 'url(' + modalImage + ')' }"> </div> -->
+        </div>
+        <div class="row modal-info">
+          <label class="modal-name">{{modalName}}</label>
+        </div>
+        <div class="row">
+          <div class="two columns modal-color" v-for="swatch in swatches">
+            <div class="color-block" v-bind:style="{'background-color': swatch.hex }"> </div>
+            <div><span style="float: left;">RGB:</span><span style="float: right;">{{arrToStr(swatch.rgb,'')}}</span></div>
+            <br />
+            <div><span style="float: left;">HEX:</span><span style="float: right;">{{swatch.hex}}</span></div>
+            <!-- <br />
+            <div><span style="float: left;">CMYK:</span><span style="float: right;">{{arrToStr(swatch.cmyk,'')}}</span></div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" v-if="aboutState">
+      <div class="container modal-content " v-click-outside="hideAbout">
+        <div class="row">
+          <h1>About ColorSplash</h1>
+          <h2>What is it?</h2>
+          <p>
+            ColorSplash uses the <a href="https://github.com/akfish/node-vibrant/">node-vibrant</a> library
+            to extract colors from images and presents them in a simple and easy to use way.
+            It gets images from <a href="https://unsplash.com/">Unsplash</a>.
+          </p>
+
+          <h2>Why use it?</h2>
+          <p>
+            Deciding on colors for projects is a surprisingly time-consuming project.
+             ColorSplash aims to serve as a tool to generate beautiful color schemes based on images to speed up the process.
+          </p>
+
+          <h2>Who is this for?</h2>
+          <p>
+            Anyone who wants to save time on design projects or wants a color scheme to go with a picture.
+          </p>
+
+          <h2>Who made this?</h2>
+          <p>
+            My name is Carlton Segbefia. I’m a computer science and sociology major in Grinnell College with a love for design.
+            ColorSplash was an idea that came to mind when I was working on a poster for a club event and after a few months of work between colors,
+            I completed it. Feel free to send any and all feedback to <em> me@carltonsegbefia.com</em>.
+          </p>
+
+      <h2>Future Improvements?</h2>
+      <p>
+        Currently, ColorSplash uses a direct method of quantizing the images and extracting colors based on the amount of representation.
+        A better method would be to account for the ways humans perceive colors and how they look when put together.
+        In other words, rather than focusing on accuracy, rather focus on how the colors look together, This can probably be done with a bit of machine learning.
+
+      </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  <!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <script src="js/vue.min.js"></script>
+  <script src="js/vibrant.js"></script>
+  <script src="js/axios.min.js"></script>
+  <script src="js/vue-masonry.min.js"></script>
+  <script src="js/vue-observe-visibility.min.js"></script>
+  <script src="js/vue-scrollto.js"></script>
+
+  <script>
+    Vue.directive('click-outside', {
+      bind: function(el, binding, vnode) {
+        el.clickOutsideEvent = function(event) {
+          // here I check that click was outside the el and his childrens
+          if (!(el == event.target || el.contains(event.target))) {
+            // and if it did, call method provided in attribute value
+            vnode.context[binding.expression](event);
+          }
+        };
+        document.body.addEventListener('click', el.clickOutsideEvent)
+      },
+      unbind: function(el) {
+        document.body.removeEventListener('click', el.clickOutsideEvent)
+      },
+    });
+
+    VueScrollTo.setDefaults({
+      container: "body",
+      duration: 500,
+      easing: "ease",
+      offset: 0,
+      force: true,
+      cancelable: true,
+      onStart: false,
+      onDone: false,
+      onCancel: false,
+      x: false,
+      y: true
+    });
+
+    vm = new Vue({
+      el: '#app',
+
+      components: {
+
+      },
+
+      data: {
+        modalState: false,
+        aboutState: false,
+        query: '',
+        galleryState: false,
+        modalImage: '',
+        modalName: '',
+        file: {},
+        fileLoaded: false,
+        maxPages: 1,
+        swatches: [],
+        varToken: "6706c7e8d2b9ed3f89b647a0201804c88f2846e3f109be44940efcc4a23db74a",
+        showNav: false,
+        searchedQuery: "",
+        page: 1,
+        items: [],
+      },
+      methods: {
+        onInitialized() {
+          this.eventLog += 'Initialized\n';
+        },
+        // get curated photos from unsplash and assign to items
+        getCuratedPhotos() {
+
+        },
+
+        showButton() {
+          if (this.galleryState) {
+            if (this.page < this.maxPages) {
+              return true;
+            } else {
+              return false;
+            }
+          } else {
+            return false;
+          }
+        },
+
+        imageChange(evt) {
+          this.file = evt.target.files[0];
+          var vm = this;
+          this.loadImage(this.file)
+        },
+
+        loadImage(file) {
+          var reader = new FileReader();
+          var vm = this;
+          this.page = 0;
+
+          reader.onload = (e) => {
+            this.fileLoaded = true;
+            vm.showModal(e.target.result, "you?");
+          };
+          reader.readAsDataURL(file);
+
+        },
+
+        search() {
+          if (this.query != '') {
+            if (this.validURL(this.query)) {
+              this.showModal(this.query, "Unknown");
+            } else {
+              this.galleryState = true;
+              this.searchedQuery = this.query;
+              this.loadImages(this.query);
+            }
+          }
+        },
+        gotoGallery() {
+          VueScrollTo.scrollTo(this.$refs.gallery)
+        },
+
+        gotoIntro() {
+          VueScrollTo.scrollTo(this.$refs.intro)
+          this.showNav = false;
+        },
+
+        loadMore: function() {
+          // console.log("loadMore");
+          this.page = this.page + 1
+          this.addImages(this.searchedQuery, this.page);
+        },
+
+        loadImages(searchQuery) {
+          // console.log("loadImages");
+          axios.get('http://api.unsplash.com/search/photos/', {
+            params: {
+              page: 1,
+              query: searchQuery
+            },
+            headers: {
+              Authorization: 'Client-ID ' + this.varToken
+            }
+          }).then(response => (this.items = response.data.results,
+            this.maxPages = response.data.total_pages,
+            this.gotoGallery()))
+        },
+
+        addImages(searchQuery, page) {
+          axios.get('http://api.unsplash.com/search/photos/', {
+            params: {
+              page: page,
+              query: searchQuery
+            },
+            headers: {
+              Authorization: 'Client-ID ' + this.varToken
+            }
+          }).then(response => (this.items.push(...response.data.results)))
+        },
+
+        validURL(str) {
+          var regex = /^(f|ht)tps?:\/\//;
+          if (!regex.test(str)) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+
+        closeModalWithEsc(e) {
+          if (e.keyCode === 27 && this.modalState) {
+            this.modalState = false
+          }
+        },
+
+        hideModal() {
+          // console.log("hideModal");
+          document.documentElement.style.overflow = 'auto';
+          this.modalState = false;
+          this.showNav = true;
+          this.fileLoaded = false;
+          this.swatches = [];
+        },
+
+        hideAbout() {
+          // console.log("hideAbout");
+          document.documentElement.style.overflow = 'auto';
+          this.aboutState = false;
+          this.showNav = true;
+        },
+
+        showAbout() {
+          // console.log("showAbout");
+          document.documentElement.style.overflow = 'hidden';
+          this.aboutState = true;
+          this.showNav = false;
+        },
+
+        introSearchVisibilityChanged(isVisible, entry) {
+          this.showNav = !isVisible;
+        },
+
+        showModal(imageUrl, creator) {
+          // console.log("showModal");
+
+          document.documentElement.style.overflow = 'hidden';
+          this.modalImage = imageUrl;
+
+          var image = new Image();
+          image.crossOrigin = "anonymous";
+          image.onload = function () {
+            vm.getSwatches(image);
+          };
+          image.src = imageUrl ;
+
+          // this.getSwatches(imageUrl);
+          this.modalState = true;
+          this.showNav = false;
+
+          if (this.fileLoaded) {
+              this.modalName = "";
+          } else {
+            this.modalName = "Photo by " + creator + ", provided by Unsplash";
+          }
+
+        },
+
+        getSwatches(imageUrl) {
+          var Options = {
+            colorCount: 256,
+            quality: 1,
+            maxDimension: undefined,
+            filters: [],
+            ImageClass: Image.Browser,
+            quantizer: Vibrant.Quantizer.MMCQ,
+            generator: Vibrant.Generator.Default,
+          };
+
+          var v = new Vibrant(imageUrl, Options);
+          v.getPalette().then((palette) => this.updatePalette(palette));
+          // v.getPalette((err, palette) => this.updatePalette(palette));
+        },
+
+        updatePalette(swatches) {
+          var i = 0;
+          var rgb = [];
+          this.swatches = [];
+          for (var swatch in swatches) {
+            if (swatches.hasOwnProperty(swatch) && swatches[swatch]) {
+              // console.log(swatch, swatches[swatch].getHex())
+              var item = {
+                hex: '',
+                rgb: '',
+                cmyk: ''
+              };
+              item.hex = swatches[swatch].getHex();
+              rgb = swatches[swatch].getRgb();
+              rgb = rgb.map(this.toInt)
+              item.rgb = rgb;
+              item.cmyk = this.rgb2cmyk(rgb);
+              // item.cmyk = swatches[swatch].getHsl();
+              this.swatches.push(item);
+              // this.swatches[i].hex = swatches[swatch].getHex();
+              // rgb = swatches[swatch].getRgb();
+              // this.swatches[i].rgb = rgb;
+              // this.swatches[i].cmyk = this.rgb2cmyk(rgb);
+            }
+          }
+
+        },
+
+        toInt(v){
+          return Number((v).toFixed(0));
+        },
+
+        arrToStr(arr, endStr) {
+          var str = '';
+          str += arr[0] + endStr;
+          for (i = 1; i < arr.length; i++) {
+            str += ', ' + arr[i] + endStr;
+          }
+          return str;
+        },
+
+        rgb2cmyk(RGB) {
+          var result = [0, 0, 0, 0];
+
+          r = RGB[0] / 255;
+          g = RGB[1] / 255;
+          b = RGB[2] / 255;
+
+          result[3] = Math.min(1 - r, 1 - g, 1 - b);
+          result[0] = (1 - r - result[3]) / (1 - result[3]);
+          result[1] = (1 - g - result[3]) / (1 - result[3]);
+          result[2] = (1 - b - result[3]) / (1 - result[3]);
+
+          result[0] = Math.round(result[0] * 100);
+          result[1] = Math.round(result[1] * 100);
+          result[2] = Math.round(result[2] * 100);
+          result[3] = Math.round(result[3] * 100);
+
+          return result;
+        },
+
+      },
+
+      created() {
+        document.addEventListener('keydown', this.closeModalWithEsc)
+      },
+      destroyed() {
+        document.removeEventListener('keydown', this.closeModalWithEsc)
+      },
+
+      events: {
+        hideModalEvent: function() {
+          this.hideModal();
+        }
+      }
+    });
+  </script>
+
+</body>
+
+</html>
