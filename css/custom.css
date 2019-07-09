@@ -162,7 +162,6 @@ html, body {
   align-items: center;
 }
 .intro-logo{
-  font-size: 5em;
   /* text-align: center; */
   background: -webkit-linear-gradient(#56CCF2, #2F80ED);
   -webkit-background-clip: text;
@@ -245,7 +244,7 @@ html, body {
 
 /************* footer ***********/
 .footer{
-  margin-bottom: 0px;
+  padding: 2.5px 0;
   color: white;
   background-color: #2F80ED;
   text-align: right;

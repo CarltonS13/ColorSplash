@@ -16,7 +16,7 @@
 
   <!-- FONT
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
 
   <!-- CSS
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -44,8 +44,8 @@
       <div class="intro-search">
         <h1 class="intro-logo">ColorSplash</h1>
         <h5 v-observe-visibility="introSearchVisibilityChanged" class="intro-title">Get Color Schemes from Images</h5>
-        <input v-model="query" class="intro-search-bar" placeholder="search or enter url" style="padding-left: 1em;">
-        <button v-on:click="search()" v-on:keyup.enter="search()" class="intro-search-btn button-primary">Search</button>
+        <input v-model="query" v-on:keyup.enter="search()" class="intro-search-bar" placeholder="enter search" style="padding-left: 1em;">
+        <button v-on:click="search()" class="intro-search-btn button-primary">Search</button>
         <!-- <button v-on:click="search()" class="intro-search-btn button-primary">Upload Image</button> -->
         <div class="upload-btn-wrapper">
           <button class="intro-search-btn button-primary">Upload Image</button>
@@ -77,7 +77,7 @@
         <div v-if="this.galleryState" id="gallery" ref="gallery" class="gallery">
           <h2 class="gallery-title">{{this.searchedQuery}}</h2>
           <masonry :cols="{default: 3, 1000: 3, 700: 2, 500: 1}" :gutter="0">
-            <div class="gallery-item" v-for="(item, index) in items" :key="index" v-on:click="showModal(item.urls.small, item.user.name)">
+            <div class="gallery-item" v-for="(item, index) in items" :key="index" v-on:click="showModal(item.urls.small, item.user.name, item.user.links.html)">
               <img class="u-max-full-width" :src="item.urls.small" alt="an image from unsplash">
             </div>
           </masonry>
@@ -93,7 +93,7 @@
       </div>
     </div>
 
-    <footer  class="footer">
+    <footer class="footer">
       <div class="container">
         <div class="twelve columns">
           <div class="two columns">
@@ -116,14 +116,14 @@
           <!-- <div class="modal-image" v-bind:style="{ backgroundImage: 'url(' + modalImage + ')' }"> </div> -->
         </div>
         <div class="row modal-info">
-          <label class="modal-name">{{modalName}}</label>
+          <label v-if="modalName" class="modal-name"> Photo by <a :href="creatorReferral + '?utm_source=clrSplash&utm_medium=referral'">{{creatorName}}</a> on <a href="https://unsplash.com/?utm_source=clrSplash&utm_medium=referral">Unsplash</a></label>
         </div>
         <div class="row">
           <div class="two columns modal-color" v-for="swatch in swatches">
             <div class="color-block" v-bind:style="{'background-color': swatch.hex }"> </div>
-            <div><span style="float: left;">RGB:</span><span style="float: right;">{{arrToStr(swatch.rgb,'')}}</span></div>
+            <div><span style="float: right;">{{arrToStr(swatch.rgb,'')}}</span></div>
             <br />
-            <div><span style="float: left;">HEX:</span><span style="float: right;">{{swatch.hex}}</span></div>
+            <div><span style="float: right;">{{swatch.hex}}</span></div>
             <!-- <br />
             <div><span style="float: left;">CMYK:</span><span style="float: right;">{{arrToStr(swatch.cmyk,'')}}</span></div> -->
           </div>
@@ -231,7 +231,9 @@
         query: '',
         galleryState: false,
         modalImage: '',
-        modalName: '',
+        modalName: false,
+        creatorName:'',
+        creatorReferral:'',
         file: {},
         fileLoaded: false,
         maxPages: 1,
@@ -272,8 +274,6 @@
         loadImage(file) {
           var reader = new FileReader();
           var vm = this;
-          this.page = 0;
-
           reader.onload = (e) => {
             this.fileLoaded = true;
             vm.showModal(e.target.result, "you?");
@@ -357,6 +357,7 @@
           this.showNav = true;
           this.fileLoaded = false;
           this.swatches = [];
+          this.modalName = false;
         },
 
         hideAbout() {
@@ -377,7 +378,7 @@
           this.showNav = !isVisible;
         },
 
-        showModal(imageUrl, creator) {
+        showModal(imageUrl, creator, referral) {
           // console.log("showModal");
 
           document.documentElement.style.overflow = 'hidden';
@@ -395,9 +396,15 @@
           this.showNav = false;
 
           if (this.fileLoaded) {
-              this.modalName = "";
+              this.modalName = true;
           } else {
-            this.modalName = "Photo by " + creator + ", provided by Unsplash";
+            this.creatorName = creator;
+            this.creatorReferral = referral;
+            if (this.creatorReferral == ''){
+              this.modalName = false;
+            }else{
+              this.modalName = true;
+            }
           }
 
         },
